@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scilla Cariddi Rental Boat</title>
+    <style>
+        :root {
+            --background-color: #111111;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--background-color);
+            font-family: Arial, sans-serif;
+        }
+
+        @property --rY {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
+        @property --rY2 {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
+        @property --hue {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        .scene {
+            position: relative;
+            width: 400px;
+            aspect-ratio: 1;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotateY(var(--rY2));
+            i {
+                --animation-color: color 2s calc(var(--i) * -.01s) linear infinite alternate;
+                position: absolute;
+                width: 60px;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                filter: hue-rotate(var(--hue));
+                transform: translate3d(var(--x), var(--y), var(--z)) rotateY(var(--rY)) !important;
+                animation: rotateN 10s linear infinite, var(--animation-color);
+                &:nth-of-type(even) {
+                    --animation-color: color2 4s calc(var(--i) * .01s) linear infinite reverse;
+                }
+            }
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                --rY2: 0deg;
+            }
+            100% {
+                --rY2: 360deg;
+            }
+        }
+
+        @keyframes rotateN {
+            0% {
+                --rY: 0deg;
+            }
+            100% {
+                --rY: -360deg;
+            }
+        }
+
+        @keyframes color {
+            0% {
+                background: red;
+                --hue: 0deg;
+            }
+            100% {
+                background: black;
+                --hue: 360deg;
+            }
+        }
+
+        @keyframes color2 {
+            0% {
+                background: white;
+                --hue: 0deg;
+            }
+            100% {
+                background: red;
+                --hue: 360deg;
+            }
+        }
+
+        #text {
+            position: absolute;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene"></div>
+    <div id="text">Il mondo di Scilla Cariddi Rental Boat</div>
+
+    <script>
+        const numPoints = 120;
+        const radius = 150;
+        const sphereElement = document.querySelector('.scene');
+
+        function createPoint(x, y, z, index) {
+            const point = document.createElement('i');
+            point.className = 'point';
+            point.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+            point.style.setProperty('--i', index);
+            point.style.setProperty('--x', x + 'px');
+            point.style.setProperty('--y', y + 'px');
+            point.style.setProperty('--z', z + 'px');
+            return point;
+        }
+
+        function sphere(samples, radius, index) {
+            const points = [];
+            const phi = Math.PI * (3 - Math.sqrt(5));
+
+            for (let i = 0; i < samples; i++) {
+                const y = 1 - (i / (samples - 1)) * 2;
+                const radiusAtY = Math.sqrt(1 - y * y);
+
+                const theta = phi * i;
+
+                const x = Math.cos(theta) * radiusAtY;
+                const z = Math.sin(theta) * radiusAtY;
+                const index = i;
+
+                points.push({ x: x * radius, y: y * radius, z: z * radius, index: index});
+            }
+            return points;
+        }
+
+        const points = sphere(numPoints, radius);
+        points.forEach(point => {
+            const elem = createPoint(point.x, point.y, point.z, point.index);
+            sphereElement.appendChild(elem);
+        });
+
+        // Animazione della scritta
+        const textElement = document.getElementById('text');
+        setTimeout(() => {
+            textElement.style.opacity = 1;
+        }, 2000); // Ritardo di 2 secondi
+    </script>
+
+</body>
+</html>
